@@ -1,0 +1,146 @@
+/*************************************************************************
+        > File Name: 1.vector.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Fri 10 May 2024 04:35:31 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define MAX_VECTOR 10
+#define p()\
+{\
+    printf("\n");\
+}
+typedef struct vector
+{
+    int count,size;
+    int *data;
+}vector;
+
+vector* init_vector(int n)
+{
+    vector* v=(vector*)malloc(sizeof(vector));
+    v->data=(int *)malloc(sizeof(int)*n);
+    v->size=n;
+    v->count=0;
+    return v;
+}
+
+int expend(vector* v)
+{
+    if(v==NULL)return 0;
+    int size=v->size;
+    int *p=NULL;
+    while(size)
+    {
+        p=(int*)realloc(v->data,sizeof(int)*(v->size+size));
+        if(p!=NULL)break;
+        size/=2;
+    }
+    if(p==NULL)return 0;
+    v->data=p;
+    v->size+=size;
+    printf("扩容成功，扩容后大小为%d\n",v->size);
+    return 1;
+}
+
+
+
+int insert(vector* v,int pos,int x)
+{
+    if(pos<0||pos>v->count||pos==v->size)
+    {
+        printf("插入位置不合法\n");
+        return 0;
+    }
+    if(v->count==v->size&&!expend(v))
+    {
+        printf("顺序表满并且扩容失败，无法插入\n");
+        return 0;
+    }
+    for(int i=v->count-1;i>=pos;i--)
+    {
+        v->data[i+1]=v->data[i];
+    }
+    v->data[pos]=x;
+    v->count++;
+    return 1;
+}
+
+int delete(vector* v,int pos)
+{
+    if(v->count==0)
+    {
+        printf("顺序表为空，无法删除\n");
+        return 0;
+    }
+    if(pos<0||pos>=v->count)
+    {
+        printf("删除位置不合法\n");
+        return 0;
+    }
+    for(int i=pos+1;i<v->count;i++)
+    {
+        v->data[i-1]=v->data[i];
+    }
+    v->count--;
+    return 1;
+}
+
+void print(vector* v)
+{
+    int len=0;
+    for(int i=0;i<v->count;i++)
+    {
+        len+=printf("%3d",v->data[i]);
+    }
+    p();
+    for(int i=0;i<len;i++)
+    {
+        printf("-");
+    }
+    p();
+    for(int i=0;i<v->count;i++)
+    {
+        printf("%3d",i);
+    }
+    p();
+    return ;
+}
+
+
+void clear_vector(vector* v)
+{
+    if(v==NULL)return ;
+    free(v->data);
+    free(v);
+    return ;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    vector* v=init_vector(MAX_VECTOR);
+    int t,pos,x;
+    while(scanf("%d",&t)!=EOF)
+    {
+        switch(t)
+        {
+            case 0:
+            pos=rand()%(v->count+2);
+            x=rand()%100;
+            printf("插入位置为%d,插入值为%d,插入是否成功(1/0)%d\n",pos,x,insert(v,pos,x));
+            print(v);
+            break;
+            case 1:
+            pos=rand()%(v->count+2);
+            printf("删除位置为%d，删除值为%d,删除是否成功(1/0)%d\n",pos,v->data[pos],delete(v,pos));
+            print(v);
+            break;
+        }
+    }
+    clear_vector(v);
+    return 0;
+}
