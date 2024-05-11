@@ -1,0 +1,43 @@
+/*************************************************************************
+        > File Name: 4.ishappy.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sat 11 May 2024 04:17:33 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <math.h>
+
+int next(int n)
+{
+    double x=0;
+    while(n)
+    {
+        x+=pow(n%10,2);
+        n/=10;
+    }
+    return (int)x;
+}
+
+int ishappy(int n)
+{
+    int p=n,q=n;
+    while(q!=1)
+    {
+        p=next(p);
+        q=next(next(q));
+        if(p==q&&p!=1)return 0;
+    }
+    return 1;
+}
+
+int main()
+{
+    int n;
+    while(scanf("%d",&n)!=EOF)
+    {
+        if(ishappy(n)) printf("是快乐数\n");
+        else printf("不是快乐数\n");
+    }
+    return 0;
+}
