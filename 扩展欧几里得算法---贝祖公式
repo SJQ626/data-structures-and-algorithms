@@ -1,0 +1,35 @@
+/*************************************************************************
+        > File Name: 3.ex_gcd.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sat 11 May 2024 04:00:38 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+
+int x,y;
+int ex_gcd(int a,int b)
+{
+    if(b==0)
+    {
+        x=1,y=0;
+        return a;
+    }
+    int c=ex_gcd(b,a%b);
+    int m,n;
+    m=y;
+    n=x-a/b*y;
+    x=m;
+    y=n;
+    return c;
+}
+
+int main()
+{
+    int a,b;
+    while(scanf("%d%d",&a,&b)!=EOF)
+    {
+        printf("%d*%d+%d*%d=%d\n",a,x,b,y,ex_gcd(a,b));
+    }
+    return 0;
+}
