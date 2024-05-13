@@ -1,0 +1,44 @@
+#include<stdio.h>
+#include <string.h>
+#define MAX_LEN 100
+#define max(a,b)  ((a)>(b)?(a):(b))
+void LCS(char dp[][MAX_LEN+5],char *s1,char *s2,int m,int n)
+{
+    for(int i=1;i<=m;i++)
+    {
+        for(int j=1;j<=n;j++)
+        {
+            dp[i][j]=max(dp[i][j-1],dp[i-1][j]);
+            if(s1[i]==s2[j]) dp[i][j]=max(dp[i][j],dp[i-1][j-1]+1);
+        }
+    }
+    int max=dp[m][n];
+    printf("最长公共长度为%d\n",max);
+    char lcs[max+1];
+    lcs[max]='\0';
+    while(m>0&&n>0)
+    {
+        if(s1[m]==s2[n])
+        {
+            lcs[max-1]=s1[m];
+            m--;
+            n--;
+            max--;
+        }
+        else if(dp[m-1][n]>dp[m][n-1])m--;
+        else n--;
+    }
+    printf("序列为%s\n",lcs);
+    return ;
+}
+
+int main()
+{
+    char s1[MAX_LEN+5],s2[MAX_LEN+5];
+    scanf("%s%s",s1+1,s2+1);
+    int m=strlen(s1+1),n=strlen(s2+1);
+    char dp[MAX_LEN+5][MAX_LEN+5]={0};
+    LCS(dp,s1,s2,m,n);
+
+    return 0;
+}
