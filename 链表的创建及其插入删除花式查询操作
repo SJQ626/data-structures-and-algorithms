@@ -1,0 +1,186 @@
+sjq@SEER:~/coding$ cat 5.linklist.c 
+/*************************************************************************
+        > File Name: 5.linklist.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sun 12 May 2024 08:28:54 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <time.h>
+typedef struct Node
+{
+    int data;
+    struct Node* next;
+}Node;
+
+Node* init_Node(int val)
+{
+    Node* node=(Node*)malloc(sizeof(Node));
+    node->data=val;
+    node->next=NULL;
+    return node;
+}
+
+
+int linklist_len(Node* head)
+{
+    int len=0;
+    while(head)
+    {
+        len++;
+        head=head->next;
+    }
+    return len;
+}
+
+Node* insert(Node* head,int pos,int val)
+{
+    int len=linklist_len(head);
+    if(pos>len)
+    {
+        printf("插入位置不合法\n");
+        return head;
+    }
+    Node New_head;
+    New_head.next=head;
+    Node* p=&New_head;
+    for(int i=0;i<pos;i++)p=p->next;
+    Node* node=init_Node(val);
+    node->next=p->next;
+    p->next=node;
+    return New_head.next;
+}
+
+Node* delete(Node* head,int val)
+{
+    if(head==NULL)
+    {
+        printf("链表为空，无法删除\n");
+        return head;
+    }
+    Node New_head;
+    New_head.next=head;
+    Node*q=&New_head;
+    Node* p=head;
+   while(p!=NULL&&p->data!=val)
+    {
+        q=p;
+        p=p->next;
+    }
+    if(p==NULL)
+    {
+        printf("查无此值，无法删除\n");
+        return New_head.next;
+    }
+    q->next=p->next;
+    free(p);
+    printf("删除成功\n");
+    return New_head.next;
+}
+
+void clear_linklist(Node* head)
+{
+    if(head==NULL)return ;
+    for(Node* p=head,*q;p;p=q)
+    {
+        q=p->next;
+        free(p);
+    }
+    return ;
+}
+
+void print(Node* head)
+{
+    printf("当前链表为：\n");
+    int len=0,f=0;
+    while(head)
+    {
+        len+=printf("%2d",head->data);
+        f++;
+        len+=printf("->");
+        head=head->next;
+    }
+    printf("\n");
+    for(int i=0;i<len;i++)
+    {
+        printf("-");
+    }
+    printf("\n");
+    for(int i=0;i<f;i++)
+    {
+        printf("%3d",i);
+    }
+    printf("\n");
+    return ;
+}
+
+void search(Node* head,int val)
+{
+    if(head==NULL)
+    {
+        printf("链表为空\n");
+        return ;
+    }
+    Node* p=head;
+    int len=0;
+    while(p&&p->data!=val)
+    {
+        len++;
+        p=p->next;
+    }
+    if(p==NULL)
+    {
+        printf("查无此值\n");
+        return ; 
+    }
+    print(head);
+    for(int i=0;i<(2*len+1)*2-1;i++)
+    {
+        printf(" ");
+    }
+    printf("^\n");
+    for(int i=0;i<(2*len+1)*2-1;i++)
+    {
+        printf(" ");
+    }
+    printf("|");
+    printf("\n\n\n\n");
+    return ;
+}
+
+
+int main()
+{
+    srand((unsigned)time(0));
+    Node* head=NULL;
+    int t,flg=0,pos,val;
+    print(head);
+    while(printf("插入位置从0开始，输入0为插入，输入1为删除，输入2为查询，请输入:")&&scanf("%d",&t)!=EOF)
+    {
+        switch(t)
+        {
+            case 0:
+            printf("输入插入的位置与插入的值:");
+            scanf("%d%d",&pos,&val);
+            head=insert(head,pos,val);
+            print(head);
+            break;
+            case 1:
+            printf("请输入要删除的值:");
+            scanf("%d",&val);
+            head=delete(head,val);
+            print(head);
+            break;
+            case 2:
+            printf("请输入要查找的值:\n");
+            scanf("%d",&val);
+            search(head,val);
+            print(head);
+        }
+    }
+
+    clear_linklist(head);
+    return 0;
+}
