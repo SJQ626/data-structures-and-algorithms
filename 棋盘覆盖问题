@@ -1,0 +1,93 @@
+/*************************************************************************
+        > File Name: 6.converboard.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Mon 13 May 2024 05:40:01 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+
+int **init_board(int k)
+{
+    int **board=(int**)malloc(sizeof(int *)*k);
+    for(int i=0;i<k;i++)
+    {
+        board[i]=(int *)malloc(sizeof(int)*k);
+    }
+    for(int i=0;i<k;i++)
+    {
+        for(int j=0;j<k;j++)
+        {
+            board[i][j]=0;
+        }
+    }
+    return board;
+}
+int f=1;
+void converboard(int sr,int sc,int dr,int dc,int size,int **board)
+{
+    if(size==1)return ;
+    size/=2;
+    int flg=f++;
+    if(dr<sr+size&&dc<sc+size)converboard(sr,sc,dr,dc,size,board);
+    else 
+    {
+        board[sr+size-1][sc+size-1]=flg;
+        converboard(sr,sc,sr+size-1,sc+size-1,size,board);
+    }
+    if(dr<sr+size&&dc>=sc+size)converboard(sr,sc+size,dr,dc,size,board);
+    else
+    {
+        board[sr+size-1][sc+size]=flg;
+        converboard(sr,sc+size,sr+size-1,sc+size,size,board);
+    }
+    if(dr>=sr+size&&dc<sc+size)converboard(sr+size,sc,dr,dc,size,board);
+    else
+    {
+        board[sr+size][sc+size-1]=flg;
+        converboard(sr+size,sc,sr+size,sc+size-1,size,board);
+    }
+    if(dr>=sr+size&&dc>=sc+size)converboard(sr+size,sc+size,dr,dc,size,board);
+    else
+    {
+        board[sr+size][sc+size]=flg;
+        converboard(sr+size,sc+size,sr+size,sc+size,size,board);
+    }
+    return ;
+}
+
+void clear(int **board,int k)
+{
+    if(board==NULL)return ;
+    for(int i=0;i<k;i++)
+    {
+        free(board[i]);
+    }
+    free(board);
+    return ;
+}
+
+int main()
+{
+    int x,y,k;
+    printf("请输入特殊棋盘的行大小2^k中的k:");
+    scanf("%d",&k);
+    k=1<<k;
+    int **board=init_board(k);
+    printf("请输入特殊方格的位置x y:");
+    scanf("%d%d",&x,&y);
+    board[x][y]=-1;
+    converboard(0,0,x,y,k,board);
+    for(int i=0;i<k;i++)
+    {
+        for(int j=0;j<k;j++)
+        {
+            printf("%3d",board[i][j]);
+        }
+        printf("\n");
+    }
+
+    clear(board,k);
+    return 0;
+}
