@@ -1,0 +1,98 @@
+/*************************************************************************
+        > File Name: 8.reverlinklist.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Wed 15 May 2024 03:24:48 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define MAX_LIST 10
+typedef struct Node
+{
+    int data;
+    struct Node* next;
+}Node;
+
+Node* init_Node(int val)
+{
+    Node* node=(Node*)malloc(sizeof(Node));
+    node->data=val;
+    node->next=NULL;
+    return node;
+}
+
+Node* insert(Node* head,int pos,int val)
+{
+    Node New_head;
+    New_head.next=head;
+    Node* p=&New_head;
+    for(int i=0;i<pos;i++)p=p->next;
+    Node* node=init_Node(val);
+    node->next=p->next;
+    p->next=node;
+    return New_head.next;
+}
+
+
+
+
+void clear_linklist(Node* head)
+{
+    if(head==NULL)return ;
+    for(Node* p=head,*q;p;p=q)
+    {
+        q=p->next;
+        free(p);
+    }
+    head=NULL;
+    return ;
+}
+
+void print(Node* head)
+{
+    Node* p=head;
+    while(p)
+    {
+        printf("%3d",p->data);
+        printf("->");
+        p=p->next;
+    }
+    printf("\n");
+    return ;
+}
+
+Node* reverlinklist(Node* head)
+{
+    Node New_head;
+    New_head.next=NULL;
+    Node* p=head,*q;
+    while(p)
+    {
+        q=p->next;
+        p->next=New_head.next;
+        New_head.next=p;
+        p=q;
+    }
+    return New_head.next;
+}
+
+
+int main()
+{
+    srand((unsigned)time(0));
+    Node* head=NULL;
+    for(int i=0;i<MAX_LIST;i++)
+    {
+        head=insert(head,i,rand()%100);
+    }
+    printf("原链表为：\n");
+    print(head);
+    head=reverlinklist(head);
+    printf("反转链表后为：\n");
+    print(head);
+
+    clear_linklist(head);
+    return 0;
+}
