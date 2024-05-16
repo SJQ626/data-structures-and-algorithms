@@ -1,0 +1,110 @@
+/*************************************************************************
+        > File Name: 10.moving_linklist.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Thu 16 May 2024 06:12:29 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#define MAX_LEN 10
+#include <time.h>
+typedef struct Node
+{
+    int data;
+    struct Node* next;
+}Node;
+
+Node* init_node(int val)
+{
+    Node* node=(Node*)malloc(sizeof(Node));
+    node->data=val;
+    node->next=NULL;
+    return node;
+}
+
+Node* insert(Node* head,int pos,int val)
+{
+    Node New_head;
+    New_head.next=head;
+    Node* p=&New_head;
+    for(int i=0;i<pos;i++)p=p->next;
+    Node* node=init_node(val);
+    node->next=p->next;
+    p->next=node;
+    return New_head.next;
+}
+
+
+void clear(Node* head)
+{
+    if(head==NULL)return ;
+    for(Node* p=head,*q;p;p=q)
+    {
+        q=p->next;
+        free(p);
+    }
+    head=NULL;
+    return ;
+}
+
+void print(Node* head)
+{
+    Node* p=head;
+    while(p)
+    {
+        printf("%3d",p->data);
+        printf("->");
+        p=p->next;
+    }
+    printf("\n");
+}
+
+int len_linklist(Node* head)
+{
+    int n=1;
+    Node* p=head;
+    while(p->next)
+    {
+        n++;
+        p=p->next;
+    }
+    return n;
+}
+
+    
+Node* moving_linklist(Node* head,int n)
+{
+    int len=len_linklist(head);
+    n=n%len;
+    Node* p=head,*q=head;
+    for(int i=0;i<n;i++)q=q->next;
+    while(q->next!=NULL)
+    {
+        p=p->next;
+        q=q->next;
+    }
+    q->next=head;
+    head=p->next;
+    p->next=NULL;
+    return head;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    Node* head=NULL;
+    for(int i=0;i<MAX_LEN;i++)
+    {
+        head=insert(head,i,rand()%100);
+    }
+    print(head);
+    int n;
+    printf("请输入移动的个数:");
+    scanf("%d",&n);
+    head=moving_linklist(head,n);
+    print(head);
+
+    clear(head);
+    return 0;
+}
