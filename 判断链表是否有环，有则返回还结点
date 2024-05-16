@@ -1,0 +1,137 @@
+/*************************************************************************
+        > File Name: 11.an_linklist_2.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Thu 16 May 2024 07:14:01 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#define MAX_LEN 20
+#include <time.h>
+
+typedef struct Node
+{
+    int data;
+    struct Node* next;
+}Node;
+
+Node* init_node(int val)
+{
+    Node* node=(Node*)malloc(sizeof(Node));
+    node->data=val;
+    node->next=NULL;
+    return node;
+}
+
+Node* insert(Node* head,int pos,int val)
+{
+    Node New_head;
+    Node* p=&New_head;
+    New_head.next=head;
+    for(int i=0;i<pos;i++)p=p->next;
+    Node* node=init_node(val);
+    node->next=p->next;
+    p->next=node;
+    return New_head.next;
+}
+
+void clear(Node* head)
+{
+    if(head==NULL)return ;
+    for(Node* p=head,*q;p;p=q)
+    {
+        q=p->next;
+        free(p);
+    }
+    return ;
+}
+
+Node* loop(Node* head,int x)
+{
+    Node* p=head;
+    for(int i=1;i<x;i++)p=p->next;
+    Node* q=head;
+    while(q->next)q=q->next;
+    q->next=p;
+    return head;
+}
+
+void print(Node* head)
+{
+    Node* p=head;
+    while(p)
+    {
+        printf("%4d",p->data);
+        p=p->next;
+    }
+    printf("\n");
+    return ;
+}
+
+int n=1;
+Node* findloop(Node* head)
+{
+    Node* p,*q;
+    p=q=head;
+    while(p&&p->next)
+    {
+        p=p->next->next;
+        q=q->next;
+        if(p==q)break;
+    }
+    if(p==NULL||p->next==NULL)
+    {
+        //printf("链表没有环\n");
+        return NULL;
+    }
+    p=head;
+    while(p!=q)
+    {
+        p=p->next;
+        q=q->next;
+        n++;
+    }
+    return p;
+}
+
+Node* unloop(Node* head)
+{
+    Node* p=findloop(head);
+    if(p==NULL)
+    {
+        //printf("链表没有环\n");
+        return head;
+    }
+    Node* q=p;
+    while(q->next!=p)
+    {
+        q=q->next;
+    }
+    q->next=NULL;
+    return head;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    Node *head=NULL;
+    for(int i=0;i<MAX_LEN;i++)
+    {
+        head=insert(head,i,i+rand()%100);
+    }
+    print(head);
+    if((rand()%100)%2) 
+    {
+        int x=rand()%(MAX_LEN-1)+1;
+        printf("环的位置是%d\n",x);
+        head=loop(head,x);
+    }
+    Node* node=findloop(head);
+    if(node!=NULL)printf("结点的数值为:%d\n",node->data);
+    else printf("此链表无环\n");
+    
+    head=unloop(head);
+    clear(head);
+    return 0;
+}
