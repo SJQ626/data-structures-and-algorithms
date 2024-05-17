@@ -1,0 +1,108 @@
+/*************************************************************************
+        > File Name: reverlinklist.2.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Fri 17 May 2024 03:50:26 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define MAX_LEN 10
+typedef struct Node
+{
+    int data;
+    struct Node* next;
+}Node;
+
+Node* init_node(int val)
+{
+    Node* node=(Node*)malloc(sizeof(Node));
+    node->data=val;
+    node->next=NULL;
+    return node;
+}
+
+Node* insert(Node* head,int pos,int val)
+{
+    Node New_head;
+    Node* p=&New_head;
+    New_head.next=head;
+    for(int i=0;i<pos;i++)p=p->next;
+    Node* node=init_node(val);
+    node->next=p->next;
+    p->next=node;
+    return New_head.next;
+}
+
+
+void clear(Node* head)
+{
+    if(head=NULL)return ;
+    for(Node* p=head,*q;p;p=q)
+    {
+        q=p->next;
+        free(p);
+    }
+    return ;
+}
+
+void print(Node* head)
+{
+    Node* p=head;
+    while(p)
+    {
+        printf("%4d",p->data);
+        printf("->");
+        p=p->next;
+    }
+    printf("\n");
+    return ;
+}
+Node* reverlinklist(Node* head,int left,int right)
+{
+    if(head==NULL)
+    {
+        printf("链表为空\n");
+        return head;
+    }
+    if(left==0&&right==0)return head;
+    if(left!=0)
+    {
+        head->next=reverlinklist(head->next,left-1,right-1);
+    }
+    else if(left==0&&right!=0)
+    {
+        Node* tail=head->next;
+        Node* New_head=reverlinklist(tail,left,right-1);
+        head->next=tail->next;
+        tail->next=head;
+        head=New_head;
+    }
+    return head;
+}
+
+
+int main()
+{
+    srand((unsigned)time(0));
+    Node* head=NULL;
+    for(int i=0;i<MAX_LEN;i++)
+    {
+        head=insert(head,i,(i+rand()%100));
+    }
+    printf("当前链表为：\n");
+    print(head);
+    int left,right;
+    printf("请输入要反转链表的位置范围：\n");
+    scanf("%d%d",&left,&right);
+    if(left<=right&&right<MAX_LEN&&left>=0&&right>=0)
+    {
+        head=reverlinklist(head,left,right);
+        printf("反转后的链表为:\n");
+        print(head);
+    }
+    else printf("输入有误\n");  
+    clear(head);
+    return 0;
+}
