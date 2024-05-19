@@ -1,0 +1,173 @@
+/*************************************************************************
+        > File Name: 14.queue_linklist.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sun 19 May 2024 03:00:42 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define MAX_TEST 10
+typedef struct Node
+{
+    int data;
+    struct Node* next;
+}Node;
+
+typedef struct Linklist
+{
+    Node head;
+    Node* tail;
+}Linklist;
+
+typedef struct Queue
+{
+    Linklist *L;
+    int count;
+}Queue;
+
+Node* init_node(int val)
+{
+    Node* node=(Node*)malloc(sizeof(Node));
+    node->data=val;
+    node->next==NULL;
+    return node;
+}
+
+Linklist* init_linklist()
+{
+    Linklist* L=(Linklist*)malloc(sizeof(Linklist));
+    L->head.next=NULL;
+    L->tail=&(L->head);
+    return L;
+}
+
+Queue* init_queue()
+{
+    Queue* Q=(Queue*)malloc(sizeof(Queue));
+    Q->L=init_linklist();
+    Q->count=0;
+    return Q;
+}
+
+int empty_linklist(Linklist* L)
+{
+    return L->tail==&(L->head);
+}
+
+int empty(Queue* Q)
+{
+    if(empty_linklist(Q->L))
+    {
+        printf("队列为空\n");
+        return 1;
+    }
+}
+
+int search(Queue* Q)
+{
+    if(empty(Q))
+    {
+        printf("队列为空无法查看\n");
+        return 0;
+    }
+    return Q->L->head.next->data;
+}
+
+void insert(Linklist* L,int val)
+{
+    Node* node=init_node(val);
+    L->tail->next=node;
+    L->tail=node;
+    return ;
+}
+
+int push(Queue* Q,int val)
+{
+    insert(Q->L,val);
+    Q->count++;
+    return 1;
+}
+
+void delete(Linklist* L)
+{
+    Node* p=L->head.next;
+    L->head.next=p->next;
+    if(p==L->tail)L->tail=&(L->head);
+    free(p);
+    return ;
+}
+
+int pop(Queue* Q)
+{
+    if(empty_linklist(Q->L))
+    {
+        printf("队列为空无法弹出\n");
+        return 0;
+    }
+    delete(Q->L);
+    return 1;
+}
+
+void clear_linklist(Linklist* L)
+{
+    if(L==NULL)return ;
+    Node *p=L->head.next;
+    Node* q=p;
+    while(p)
+    {
+        q=p->next;
+        free(p);
+        p=q;
+    }
+    free(L);
+    return ;
+}
+
+void clear_queue(Queue* Q)
+{
+    if(Q==NULL)return ;
+    clear_linklist(Q->L);
+    free(Q);
+    return ;
+}
+
+void print(Queue* Q)
+{
+    Node* p=Q->L->head.next;
+    while(p)
+    {
+        printf("%4d",p->data);
+        p=p->next;
+    }
+    printf("\n");
+    return ;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    Queue* Q=init_queue();
+    for(int i=0;i<MAX_TEST;i++)
+    {
+        int val=rand()%100;
+        int po=rand()%3;
+        switch(po)
+        {
+            case 0:
+            case 1:
+            printf("push:%d\n",val);
+            push(Q,val);
+            print(Q);
+            break;
+            case 2:
+            printf("pop:%d\n",search(Q));
+            pop(Q);
+            print(Q);
+        }
+    }
+
+    clear_queue(Q);
+    return 0;
+}
