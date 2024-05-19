@@ -1,0 +1,152 @@
+/*************************************************************************
+        > File Name: 13.queue_vector.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sun 19 May 2024 01:29:51 PM CST
+ ************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define MAX_LEN 7
+#define MAX_TEST 10
+typedef struct Vector
+{
+    int *data;
+    int size;
+}Vector;
+
+typedef struct Queue
+{
+    Vector* v;
+    int size,count,head,tail;
+}Queue;
+
+Vector* init_vector(int n)
+{
+    Vector* v=(Vector* )malloc(sizeof(Vector));
+    v->data=(int *)malloc(sizeof(int)*n);
+    v->size=n;
+    return v;
+}
+
+void clear_vector(Vector *v)
+{
+    if(v==NULL)return ;
+    free(v->data);
+    free(v);
+    return ;
+}
+
+Queue* init_queue(int n)
+{
+    Queue* Q=(Queue*)malloc(sizeof(Queue));
+    Q->v=init_vector(n);
+    Q->count=Q->head=Q->tail=0;
+    Q->size=n;
+    return Q;
+}
+
+int vector_seek(Vector* v,int head)
+{
+    return v->data[head];
+}
+
+void insert_vector(Vector* v,int pos,int val)
+{
+    v->data[pos]=val;
+    return ;
+}
+
+int empty(Queue* Q)
+{
+    return Q->count==0;
+}
+
+int search(Queue* Q)
+{
+    if(empty(Q))
+    {
+        printf("队列为空无法查看\n");
+        return 0;
+    }
+    return vector_seek(Q->v,Q->head);
+}
+int full(Queue* Q)
+{
+    return Q->count==Q->size;
+}
+
+int push(Queue* Q,int val)
+{
+    if(full(Q))
+    {
+        printf("队列已满无法压入\n");
+        return 0;
+    }
+    insert_vector(Q->v,Q->tail,val);
+    Q->count++;
+    Q->tail++;
+    if(Q->tail==Q->size)Q->tail=0;
+    return 1;
+}
+
+int pop(Queue* Q)
+{
+    if(empty(Q))
+    {
+        printf("队列为空无法弹出\n");
+        return 0;
+    }
+    int h=Q->v->data[Q->head];
+    Q->head++;
+    Q->count--;
+    if(Q->head==Q->size)Q->head=0;
+    return h;
+}
+
+void clear_queue(Queue* Q)
+{
+    if(Q==NULL)return ;
+    clear_vector(Q->v);
+    free(Q);
+    return ;
+}
+
+void print(Queue* Q)
+{
+    for(int i=0;i<Q->count;i++)
+    {
+        printf("%4d",Q->v->data[(Q->head+i)%Q->size]);
+    }
+    printf("\n");
+    return ;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    Queue* Q=init_queue(MAX_LEN);
+    for(int i=0;i<MAX_TEST;i++)
+    {
+    int val=rand()%100+1;
+       int po=rand()%3;
+        switch(po)
+        {
+            case 0:
+            case 1:
+            printf("将%d入队\n",val);
+            push(Q,val);
+            print(Q);
+            break;
+            case 2:
+            printf("将%d出队\n",search(Q));
+            pop(Q);
+            print(Q);
+        }
+    }
+
+
+    clear_queue(Q);
+    return 0;
+}
