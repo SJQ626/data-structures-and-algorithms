@@ -1,0 +1,97 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define MAX_LEN 10
+
+char **init_str(char**str,int n)
+{
+    str=(char**)malloc(sizeof(char*)*n);
+    for(int i=0;i<n;i++)
+    {
+        str[i]=(char*)malloc(sizeof(char)*100);
+        scanf("%s",str[i]);
+    }
+    return str;
+}
+
+char **init_stack(char** stack,int n)
+{
+    stack=(char**)malloc(sizeof(char*)*n);
+    for(int i=0;i<n;i++)
+    {
+        stack[i]=(char*)malloc(sizeof(char)*100);
+    }
+    return stack;
+}
+
+
+
+void clear_str(char** str,int n)
+{
+    if(str==NULL)return ;
+    for(int i=0;i<n;i++)
+    {
+        free(str[i]);
+    }
+    free(str);
+    return ;
+}
+
+void clear_stack(char** stack,int n)
+{
+    if(stack==NULL)return ;
+    for(int i=0;i<n;i++)
+    {
+        free(stack[i]);
+    }
+    free(stack);
+    return ;
+}
+
+void print(char **stack,int top)
+{
+    if(top==-1)return ;
+    for(int i=0;i<=top;i++)
+    {
+        if(i==top) printf("%s",stack[i]);
+        else printf("%s->",stack[i]);
+    }
+    printf("\n");
+    return ;
+}
+
+void PCR(char **str,char**stack,char s[],int n)
+{
+    int top=-1;
+    for(int i=0;i<n;i++)
+    {
+        if(!strcmp(str[i],s))
+        {
+            printf("FIND IT\n");
+            print(stack,top);
+            return ;
+        }
+        if(strcmp(str[i],"return"))strcpy(stack[++top],str[i]);
+        else top--;
+    }
+    printf("NO FIND\n");
+    return ;
+}
+
+
+int main()
+{
+    printf("请输入函数以及返回的总和数:");
+    int n;
+    scanf("%d",&n);
+    char **str=init_str(str,n);
+    char** stack=init_stack(stack,MAX_LEN);
+    printf("请输入要执行的函数名:");
+    char s[100];
+    scanf("%s",s);
+    PCR(str,stack,s,n);
+
+    clear_str(str,n);
+    clear_stack(stack,MAX_LEN);
+    return 0;
+}
