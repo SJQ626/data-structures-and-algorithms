@@ -1,0 +1,118 @@
+/*************************************************************************
+        > File Name: 18.最短三元组.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Wed 22 May 2024 04:02:37 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+
+typedef struct Queue
+{
+    int *data;
+    int size,count,head,tail;
+}Queue;
+
+Queue* init_queue(int n)
+{
+    Queue* Q=(Queue*)malloc(sizeof(Queue));
+    Q->data=(int*)malloc(sizeof(int)*n);
+    Q->size=n;
+    Q->head=0;
+    printf("请输入元组的值:");
+    for(int i=0;i<n;i++)
+    {
+        scanf("%d",&(Q->data[i]));
+    }
+    Q->count=n;
+    Q->tail=n-1;
+    return Q;
+}
+
+int pop(Queue* Q)
+{
+    if(Q->count==0)
+    {
+        printf("队列为空,无法pop\n");
+        return 0;
+    }
+    Q->count-=1;
+    Q->head+=1;
+    if(Q->head==Q->size)Q->head=0;
+    return 1;
+}
+
+int search(Queue* Q)
+{
+    if(Q->count==0)
+    {
+        printf("队列为空,无法查看\n");
+        return 0;
+    }
+    return Q->data[Q->head];
+}
+
+void clear_queue(Queue* Q)
+{
+    if(Q==NULL)return ;
+    free(Q->data);
+    free(Q);
+    return ;
+}
+
+void swap(int *a,int *b)
+{
+    int t=*a;
+    *a=*b;
+    *b=t;
+    return ;
+}
+
+int Min(int a,int b,int c)
+{
+    if(a>b)swap(&a,&b);
+    if(a>c)swap(&a,&c);
+    return a;
+}
+
+void func(Queue* a,Queue* b,Queue* c)
+{
+    int min=0x7fffffff;
+    int d[3];
+    while(a->count!=0&&b->count!=0&&c->count!=0)
+    {
+        int ma=search(a),mb=search(b),mc=search(c);
+        int M=abs(ma-mb)+abs(mb-mc)+abs(ma-mc);
+        if(M<min)
+        {
+            min=M;
+            d[0]=ma,d[1]=mb,d[2]=mc;
+ 
+        }
+        int d=Min(ma,mb,mc);
+        if(ma==d)pop(a);
+        if(mb==d)pop(b);
+        if(mc==d)pop(c);
+    }
+    printf("三元组的最小值为:%d\n",min);
+    printf("三元组为(%d,%d,%d)\n",d[0],d[1],d[2]);
+    return ;
+}
+
+int main()
+{
+    int a,b,c;
+    printf("请输入三元组各自的长度:");
+    scanf("%d%d%d",&a,&b,&c);
+    Queue* Qa=init_queue(a);
+    Queue* Qb=init_queue(b);
+    Queue* Qc=init_queue(c);
+    
+    func(Qa,Qb,Qc);
+
+    clear_queue(Qa);
+    clear_queue(Qb);
+    clear_queue(Qc);
+    return 0;
+}
