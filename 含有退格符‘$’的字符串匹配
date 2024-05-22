@@ -1,0 +1,81 @@
+/*************************************************************************
+        > File Name: 19.含有退格符‘$’的字符串比较.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Wed 22 May 2024 06:07:56 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_LEN 10
+typedef struct Stack
+{
+    char* str;
+    int top, size;
+}Stack;
+
+Stack* init_stack(int n)
+{
+    Stack* S = (Stack*)malloc(sizeof(Stack));
+    S->top = -1;
+    S->str = (char*)malloc(sizeof(char) * n);
+    S->size = n;
+    return S;
+}
+
+char search(Stack* S)
+{
+    if (S == NULL)return '\0';
+    return S->str[S->top];
+}
+
+int push(Stack* S, char c)
+{
+    if (S->top == S->size - 1)return 0;
+    S->str[++S->top] = c;
+    return 1;
+}
+
+int pop(Stack* S)
+{
+    if (S->top == -1)return 0;
+    S->top--;
+    return 1;
+}
+
+void clear_stack(Stack* S)
+{
+    if (S == NULL)return;
+    free(S->str);
+    free(S);
+    return;
+}
+
+char* func(Stack* S, char* c)
+{
+    int len = strlen(c);
+    for (int i = 0; i < len; i++)
+    {
+        if (c[i] == '/')pop(S);
+        else push(S, c[i]);
+    }
+    return S->str;
+}
+
+int main()
+{
+    char c[MAX_LEN];
+    Stack* S = init_stack(MAX_LEN);
+    printf("请输入第一个字符串:");
+    scanf("%s", c);
+    char *s1=func(S,c);
+    printf("请输入第二个字符串:");
+    scanf("%s", c);
+    S->top=-1;//清栈
+    char * s2=func(S,c);
+    if (strcmp(s1, s2))printf("不匹配\n");
+    else printf("匹配\n");
+    clear_stack(S);
+    return 0;
+}
