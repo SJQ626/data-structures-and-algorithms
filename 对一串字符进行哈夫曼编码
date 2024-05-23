@@ -1,0 +1,129 @@
+#include<stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_ARR 100
+#define MAX_S 1000
+typedef struct Node
+{
+    char ch;
+    int f;
+    struct Node* lchild,*rchild;
+}Node;
+
+Node* init_node(char ch,int f)
+{
+    Node* node=(Node*)malloc(sizeof(Node));
+    node->ch=ch;
+    node->f=f;
+    node->lchild=node->rchild=NULL;
+    return node;
+}
+
+void clear_tree(Node* root)
+{
+    if(root==NULL)return ;
+    clear_tree(root->lchild);
+    clear_tree(root->rchild);
+    free(root);
+    return ;
+}
+
+int FindMIN(Node** arr,int n)
+{
+    int min=arr[0]->f;
+    int pos=0;
+    for(int i=1;i<n;i++)
+    {
+        if(arr[i]->f<min)
+        {
+            min=arr[i]->f;
+            pos=i;
+        }
+    }
+    return pos;
+}
+
+void swap(Node** a,Node** b)
+{
+    Node* t=*a;
+    *a=*b;
+    *b=t;
+    return ;
+}
+
+
+void putout_halfman(Node* root,char buff[],int k)
+{
+    buff[k]=0;
+    if(root->lchild==NULL&&root->rchild==NULL)
+    {
+        printf("%c %s\n",root->ch,buff);
+        return ;
+    }
+    buff[k]='0';
+    putout_halfman(root->lchild,buff,k+1);
+    buff[k]='1';
+    putout_halfman(root->rchild,buff,k+1);
+    return ;
+}
+
+Node* build_halfman_tree(Node** arr,int n)
+{
+    for(int i=0;i<n-1;i++)
+    {
+        int Min1=FindMIN(arr,n-i);
+        swap(&arr[Min1],&arr[n-i-1]);
+        int Min2=FindMIN(arr,n-i-1);
+        swap(&arr[Min2],&arr[n-i-2]);
+        int new=arr[n-i-1]->f+arr[n-i-2]->f;
+        Node* node=init_node('0',new);
+        node->lchild=arr[n-i-1];
+        node->rchild=arr[n-i-2];
+        arr[n-i-2]=node;
+    }
+    return arr[0];
+}
+
+void count(char s[],int str[])
+{
+    int len=strlen(s);
+    for(int i=0;i<len;i++)
+    {
+        str[(unsigned char)s[i]]++;
+    }
+    return ;
+}
+int main()
+{
+    int str[256]={0},t=0;
+    printf("请输入字符串:");
+    char s[MAX_S];
+    fgets(s,MAX_S,stdin);
+    //s[strcspn(s,'\n')]=0;
+    char *newline = strchr(s, '\n');
+    if (newline != NULL) *newline = '\0';
+
+    count(s,str);
+    for(int i=0;i<256;i++)
+    {
+        if(str[i])t++;
+    }
+
+    Node**arr=(Node**)malloc(sizeof(Node*)*MAX_ARR);
+    int index=0;
+        for(int j=0;j<256;j++)
+        {
+            if(str[j]!=0)
+            {
+                arr[index++]=init_node(j,str[j]);
+            }
+        }
+    Node*root=build_halfman_tree(arr,t);
+   
+    char buff[MAX_S];
+    putout_halfman(root,buff,0);
+
+    clear_tree(root);
+    free(arr);
+    return 0;
+}
