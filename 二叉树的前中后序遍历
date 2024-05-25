@@ -1,0 +1,143 @@
+/*************************************************************************
+        > File Name: 23.二叉树的前中后遍历.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sat 25 May 2024 02:36:43 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define MAX_NODE 10
+#define p()\
+{\
+    printf("\n");\
+}
+typedef struct Node
+{
+    int key;
+    int lfag,rfag;
+    struct Node *lchild,*rchild;
+}Node;
+
+Node* init_node(int key)
+{
+    Node* node=(Node*)malloc(sizeof(Node));
+    node->key=key;
+    node->lfag=node->rfag=0;
+    node->lchild=node->rchild=NULL;
+    return node;
+}
+
+Node* insert(Node* root,int key)
+{
+    if(root==NULL)return init_node(key);
+    if(rand()%2) root->lchild=insert(root->lchild,key);
+    else root->rchild=insert(root->rchild,key);
+    return root;
+}
+
+
+void clear_node(Node* root)
+{
+    if(root==NULL)return ;
+    if(root->lfag==0) clear_node(root->lchild);
+    if(root->rfag==0) clear_node(root->rchild);
+    free(root);
+    return ;
+}
+
+void pre_order(Node* root)
+{
+    if(root==NULL)return ;
+    printf("%d ",root->key);
+    if(root->lfag==0)pre_order(root->lchild);
+    if(root->rfag==0)pre_order(root->rchild);
+    return ;
+}
+
+void in_order(Node* root)
+{
+    if(root==NULL)return ;
+    if(root->lfag==0)in_order(root->lchild);
+    printf("%d ",root->key);
+    if(root->rfag==0)in_order(root->rchild);
+    return ;
+}
+
+void post_order(Node* root)
+{
+    if(root==NULL)return ;
+    if(root->lfag==0)post_order(root->lchild);
+    if(root->rfag==0)post_order(root->rchild);
+    printf("%d ",root->key);
+    return ;
+}
+Node* new_root=NULL,*pre_node;
+void __serial_in_order(Node* root)
+{
+    if(root==NULL)return ;
+    if(root->lfag==0)__serial_in_order(root->lchild);
+    if(new_root==NULL)new_root=root;
+    if(root->lchild==NULL)
+    {
+        root->lchild=pre_node;
+        root->lfag=1;
+    }
+    if(pre_node&&pre_node->rchild==NULL)
+    {
+        pre_node->rchild=root;
+        pre_node->rfag=1;
+    }
+    pre_node=root;
+    if(root->rfag==0)__serial_in_order(root->rchild);
+    return ;
+}
+
+void serial_in_order(Node*root)
+{
+    __serial_in_order(root);
+    pre_node->rchild=NULL;
+    pre_node->rfag=1;
+    return ;
+}
+
+Node* getnext(Node* node)
+{
+    if(node->rfag==1)return node->rchild;
+    node=node->rchild;
+    while(node->lfag==0)
+    {
+        node=node->lchild;
+    }
+    return node;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    Node* root=NULL;
+    for(int i=0;i<MAX_NODE;i++)
+    {
+        root=insert(root,rand()%100);
+    }
+   
+    serial_in_order(root);
+    Node* node=new_root;
+    printf("中序线索化遍历结果为:\n");
+    while(node)
+    {
+        printf("%d ",node->key);
+        node=getnext(node);
+    }
+    p();
+    printf("前序遍历结果为:\n");
+    pre_order(root);  p();
+    printf("中序遍历结果为:\n");
+    in_order(root);   p();
+    printf("后续遍历结果为:\n");
+    post_order(root); p();
+
+    clear_node(root);
+    return 0;
+}
