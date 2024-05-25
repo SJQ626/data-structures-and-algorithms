@@ -1,0 +1,103 @@
+/*************************************************************************
+        > File Name: 24.二叉树转广义表的序列化.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sat 25 May 2024 04:23:25 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#define key(n) (n)?(n->key):(-1)
+#define MAX_NODE 10
+
+typedef struct Node
+{
+    int key;
+    struct Node* lchild,*rchild;
+}Node;
+
+Node* init_node(int key)
+{
+    Node* node=(Node* )malloc(sizeof(Node));
+    node->key=key;
+    node->lchild=node->rchild=NULL;
+    return node;
+}
+
+Node* insert(Node* root,int key)
+{
+    if(root==NULL)return init_node(key);
+    if(rand()%2)root->lchild=insert(root->lchild,key);
+    else root->rchild=insert(root->rchild,key);
+    return root;
+}
+
+Node* get_tree(int n)
+{
+    Node* root=NULL;
+    for(int i=0;i<n;i++)
+    {
+        root=insert(root,rand()%100);
+    }
+    return root;
+}
+
+
+void clear(Node* root)
+{
+    if(root==NULL)return ;
+    clear(root->lchild);
+    clear(root->rchild);
+    free(root);
+    return ;
+}
+
+void print(Node* root)
+{
+    if(root==NULL)return ;
+    printf("%d(%d,%d)\n",key(root),key(root->lchild),key(root->rchild));
+    print(root->lchild);
+    print(root->rchild);
+    return ;
+}
+
+char buff[1000];
+int len;
+
+void __serial(Node* root)
+{
+    if(root==NULL)return ;
+    len+=snprintf(buff+len,100,"%d",root->key);
+    if(root->lchild==NULL&&root->rchild==NULL)return ;
+    len+=snprintf(buff+len,100,"(");
+    __serial(root->lchild);
+    if(root->rchild)
+    {
+        len+=snprintf(buff+len,100,",");
+        __serial(root->rchild);
+    }
+    len+=snprintf(buff+len,100,")");
+    return ;
+}
+
+void serial(Node* root)
+{
+    memset(buff,0,sizeof(buff));
+    len=0;
+    __serial(root);
+    return ;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    Node* root=get_tree(MAX_NODE);
+    printf("先序遍历每个节点的信息：\n");
+    print(root);
+    serial(root);
+    printf("广义表序列化:%s\n",buff);
+    clear(root);
+    return 0;
+}
