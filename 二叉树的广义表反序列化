@@ -1,0 +1,158 @@
+/*************************************************************************
+        > File Name: 25.二叉树的广义表反序列化.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sun 26 May 2024 03:42:59 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#define MAX_NODE 10
+#define MAX_LEN 100
+#define key(n)(n)?(n->key):(-1)
+typedef struct Node
+{
+    int key;
+    struct Node* lchild,*rchild;
+}Node;
+
+Node* init_node(int key)
+{
+    Node* node=(Node*)malloc(sizeof(Node));
+    node->key=key;
+    node->lchild=node->rchild=NULL;
+    return node;
+}
+
+Node* insert(Node* root,int key)
+{
+    if(root==NULL)return init_node(key);
+    if(rand()%2)root->lchild=insert(root->lchild,key);
+    else root->rchild=insert(root->rchild,key);
+    return root;
+}
+
+Node* getnewtree(Node* root,int n)
+{
+    for(int i=0;i<n;i++)
+    {
+        root=insert(root,rand()%100);
+    }
+    return root;
+}
+
+void clear(Node* root)
+{
+    if(root==NULL)return ;
+    clear(root->lchild);
+    clear(root->rchild);
+    free(root);
+    return ;
+}
+
+char buff[MAX_LEN];
+int len;
+void __serial(Node* root)
+{
+    if(root==NULL)return ;
+    len+=snprintf(buff+len,100,"%d",root->key);
+    if(root->lchild==NULL&&root->rchild==NULL)return ;
+    len+=snprintf(buff+len,100,"(");
+    __serial(root->lchild);
+    if(root->rchild)
+    {
+        len+=snprintf(buff+len,100,",");
+        __serial(root->rchild);
+    }
+    len+=snprintf(buff+len,100,")");
+    return ;
+}
+
+void serial(Node* root)
+{
+    memset(buff,0,sizeof(buff));
+    len=0;
+    __serial(root);
+    return ;
+}
+
+void output(Node* root)
+{
+    if(root==NULL)return ;
+    printf("%d(%d,%d)\n",key(root),key(root->lchild),key(root->rchild));
+    output(root->lchild);
+    output(root->rchild);
+}
+
+Node* diserial(char buff[],int n)
+{
+    Node* root=NULL;
+    Node* p=NULL;
+    int top=-1,state=0,fag=0;
+    Node** stack=(Node**)malloc(sizeof(Node*)*MAX_NODE);
+    for(int i=0;i<n;i++)
+    {
+        switch(state)
+        {
+            case 0:
+            {
+                if(buff[i]<='9'&&buff[i]>='0')state=1;
+                if(buff[i]=='(')state=2;
+                if(buff[i]==',')state=3;
+                if(buff[i]==')')state=4;
+                i--;
+            }break;
+            case 1:
+            {
+                int key=0;
+                while(buff[i]<='9'&&buff[i]>='0')
+                {
+                    key=key*10+(buff[i]-'0');
+                    i++;
+                }
+                p=init_node(key);
+                if(fag==0&&top>=0)stack[top]->lchild=p;
+                if(fag==1&&top>=0)stack[top]->rchild=p;
+                i--;
+                state=0;
+            }break;
+            case 2:
+            {
+                stack[++top]=p;
+                fag=0;
+                state=0;
+            }break;
+            case 3:
+            {
+                fag=1;
+                state=0;
+            }break;
+            case 4:
+            {
+                root=stack[top--];
+                state=0;
+            }break;
+        }
+    }
+    free(stack);
+return root;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    Node* root=NULL;
+    root=getnewtree(root,MAX_NODE);
+    serial(root);
+    output(root);
+    printf("广义表为:\n");
+    printf("%s\n",buff);
+    Node* new_root=diserial(buff,len);
+    printf("反序列化结果为:\n");
+    output(new_root);
+    clear(root);
+    clear(new_root);
+    return 0;
+}
