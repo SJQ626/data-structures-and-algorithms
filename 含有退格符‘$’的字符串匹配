@@ -2,7 +2,7 @@
         > File Name: 19.含有退格符‘$’的字符串比较.c
         > Author:SJQ
         > Mail:3505224319@qq.com
-        > Created Time: Wed 22 May 2024 06:07:56 PM CST
+        > Created Time: Sun 26 May 2024 03:49:30 PM CST
  ************************************************************************/
 
 #include<stdio.h>
@@ -57,9 +57,10 @@ char* func(Stack* S, char* c)
     int len = strlen(c);
     for (int i = 0; i < len; i++)
     {
-        if (c[i] == '/')pop(S);
+        if (c[i] == '$')pop(S);
         else push(S, c[i]);
     }
+    S->str[S->top+1]='\0';
     return S->str;
 }
 
@@ -70,12 +71,15 @@ int main()
     printf("请输入第一个字符串:");
     scanf("%s", c);
     char *s1=func(S,c);
+    char *new_s=(char*)malloc(strlen(s1)+1);
+    strcpy(new_s,s1);
     printf("请输入第二个字符串:");
     scanf("%s", c);
     S->top=-1;//清栈
     char * s2=func(S,c);
-    if (strcmp(s1, s2))printf("不匹配\n");
+    if (strcmp(new_s, s2))printf("不匹配\n");
     else printf("匹配\n");
     clear_stack(S);
+    free(new_s);
     return 0;
 }
