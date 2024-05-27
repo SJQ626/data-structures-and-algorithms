@@ -1,0 +1,149 @@
+/*************************************************************************
+        > File Name: 26.优先队列.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Mon 27 May 2024 04:00:38 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#define MAX_LEN 10
+#define father(n) ((n)/2)
+#define left(n)   (2*(n))
+#define right(n)  (2*(n)+1)
+typedef struct Prequeue
+{
+    int * __data,*data;
+    int size,count;
+}Prequeue;
+
+Prequeue* init_PreQueue(int size)
+{
+    Prequeue* PQ=(Prequeue*)malloc(sizeof(Prequeue));
+    PQ->size=size;
+    PQ->count=0;
+    PQ->__data=(int *)malloc(sizeof(int)*size);
+    PQ->data=PQ->__data-1;
+    return PQ;
+}
+
+int isempty(Prequeue* PQ)
+{
+    return PQ->count==0;
+}
+
+int isfull(Prequeue*PQ)
+{
+    return PQ->size==PQ->count;
+}
+
+int search(Prequeue* PQ)
+{
+    return PQ->data[1];
+}
+
+void swap(int *a,int *b)
+{
+    int t=*a;
+    *a=*b;
+    *b=t;
+    return ;
+}
+
+void up_update(Prequeue* PQ,int pos)
+{
+    while(pos>1&&PQ->data[pos]>PQ->data[father(pos)])
+    {    
+        swap(&(PQ->data[pos]),&PQ->data[father(pos)]);
+        pos=father(pos);
+    }
+    return ;
+}
+
+void push(Prequeue* PQ,int val)
+{
+    if(isfull(PQ))
+    {
+        printf("队列已满无法push\n");
+        return ;
+    }
+    PQ->count+=1;
+    PQ->data[PQ->count]=val;
+    up_update(PQ,PQ->count);
+    return ;
+}
+
+void down_update(Prequeue* PQ,int pos,int n)
+{
+    while(left(pos)<=n)
+    {
+        int max=pos;
+        if(PQ->data[max]<PQ->data[left(pos)])max=left(pos);
+        if(right(pos)<=n&&PQ->data[max]<PQ->data[right(pos)])max=right(pos);
+        if(pos==max)return ;
+        else
+        {
+            swap(&(PQ->data[max]),&(PQ->data[pos]));
+            pos=max;
+        }
+    }
+    return ;
+}
+
+void pop(Prequeue* PQ)
+{
+    if(isempty(PQ))
+    {
+        printf("队列为空无法pop\n");
+        return ;
+    }
+    PQ->data[1]=PQ->data[PQ->count];
+    PQ->count-=1;
+    down_update(PQ,1,PQ->count);
+    return ;
+}
+
+void clear(Prequeue* PQ)
+{
+    if(PQ==NULL)return ;
+    free(PQ->data);
+    free(PQ);
+    return ;
+}
+
+void output(Prequeue* PQ)
+{
+    printf("优先队列为:");
+    for(int i=1;i<=PQ->count;i++)
+    {
+        printf("%d ",PQ->data[i]);
+    }
+    printf("\n");
+    return ;
+}
+
+int main()
+{
+    Prequeue* PQ=init_PreQueue(MAX_LEN);
+    int t,val;
+    printf("请输入0(代表pop)或者1(代表push):");
+    while(scanf("%d",&t)!=EOF)
+    {
+        if(t==1)
+        {
+            printf("请输入push的数值:");
+            scanf("%d",&val);
+            push(PQ,val);
+            output(PQ);
+        }
+        if(t==0)
+        {
+            printf("pop:%d\n",search(PQ));
+            pop(PQ);
+            output(PQ);
+        } 
+        printf("请输入0(代表pop)或者1(代表push):");
+    }
+    clear(PQ);
+    return 0;
+}
