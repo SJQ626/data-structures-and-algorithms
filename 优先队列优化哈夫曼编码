@@ -1,0 +1,225 @@
+/*************************************************************************
+        > File Name: 28.优化--build_halfman_tree.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sun 02 Jun 2024 03:24:52 PM CST
+ ************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#define MAX_NODE 80
+#define MAX_STR 50
+#define MAX_HEAP 100
+#define father(i) ((i)/2)
+#define left(i)   ((i)*2)
+#define right(i)  ((i)*2+1)
+
+
+typedef struct Node
+{
+    int f;
+    char ch;
+    struct Node *lchild,*rchild;
+}Node;
+
+typedef struct Heap
+{
+    int count,size;
+    Node** __data,**data;
+}Heap;
+
+void swap(Node** a,Node** b)
+{
+    Node* t=*a;
+    *a=*b;
+    *b=t;
+    return ;
+}
+
+void down_update(Heap*,int);
+
+Heap* init_heap(int n)
+{
+    Heap* h=(Heap*)malloc(sizeof(Heap));
+    h->count=0;
+    h->size=n;
+    h->__data=(Node**)malloc(sizeof(Node*)*n);
+    h->data=h->__data-1;
+    return h;
+}
+
+int isempty(Heap *h)
+{
+    return h->count==0;
+}
+
+int isfull(Heap* h)
+{
+    return h->count==h->size;
+}
+
+void up_update(Heap* h,int i)
+{
+    while(i>1&&h->data[i]->f<h->data[father(i)]->f)
+    {
+        swap(&(h->data[i]),&(h->data[father(i)]));
+        i=father(i);
+    }
+    return ;
+}
+
+int push(Heap* h,Node* node)
+{
+    if(isfull(h))
+    {
+        printf("堆已满,无法压入\n");
+        return 0;
+    }
+    h->data[++h->count]=node;
+    up_update(h,h->count);
+    return 1;
+}
+
+Node* top(Heap* h)
+{
+    if(isempty(h))
+    {
+        printf("堆空,无法查看\n");
+        return 0;
+    }
+    return h->data[1];
+}
+
+int pop(Heap* h)
+{
+    if(isempty(h))
+    {
+        printf("堆空,无法弹出\n");
+        return 0;
+    }
+    h->data[1]=h->data[h->count--];
+    down_update(h,1);
+    return 1;
+}
+
+void down_update(Heap* h,int i)
+{
+    while(left(i)<=h->count)
+    {
+        int min=i,l=left(i),r=right(i);
+        if(h->data[min]->f>h->data[l]->f)min=l;
+        if(right(i)<=h->count&&h->data[min]->f>h->data[r]->f)min=r;
+        if(i==min)break;
+        swap(&(h->data[i]),&(h->data[min]));
+        i=min;
+    }
+    return ;
+}
+
+Node* init_node(char ch,int f)
+{
+    Node* node=(Node* )malloc(sizeof(Node));
+    node->f=f;
+    node->ch=ch;
+    node->lchild=node->rchild=NULL;
+    return node;
+}
+int fc=0;
+Node** init_arr(int n,int* s)
+{
+    fc=0;
+    Node** arr=(Node**)malloc(sizeof(Node*)*n);
+    for(int i=0;i<n;i++) arr[i]=(Node*)malloc(sizeof(Node));
+    for(int i=0;i<256;i++)
+    {
+        if(s[i]!=0)
+        {
+            Node* node=init_node((char)i,s[i]);
+            arr[fc]=node;
+            fc++;
+        }
+    }
+    return arr;
+}
+
+void clear_tree(Node* root)
+{
+    if(root==NULL)return ;
+    clear_tree(root->lchild);
+    clear_tree(root->rchild);
+    free(root);
+    return ;
+}
+
+int* count(char str[],int n)
+{
+    int *s=(int*)malloc(sizeof(int)*256);
+    for(int i=0;i<256;i++)s[i]=0;
+    for(int i=0;i<n;i++)s[(int)str[i]]+=1;
+    return s;
+}
+
+Node* CLO_build_halfman_tree(Node** arr,Heap* h,int n)
+{
+    for(int i=0;i<n-1;i++)
+    {
+        Node* node1=top(h);
+        pop(h);
+        Node* node2=top(h);
+        pop(h);
+        Node* new_node=init_node('0',node1->f+node2->f);
+        new_node->lchild=node1;
+        new_node->rchild=node2;
+        push(h,new_node);
+        arr[n-i-2]=new_node;
+    }
+    return arr[0];
+}
+
+void clear_heap(Heap* h)
+{
+    if(h==NULL)return ;
+    free(h->__data);
+    free(h);
+    return ;
+}
+
+void halfman_coding(Node* root,char buff[],int k)
+{
+    buff[k]=0;
+    if(root->lchild==NULL&&root->rchild==NULL)
+    {
+        printf("%c:%s\n",root->ch,buff);
+        return ;
+    }
+    buff[k]='0';
+    halfman_coding(root->lchild,buff,k+1);
+    buff[k]='1';
+    halfman_coding(root->rchild,buff,k+1);
+    return ;
+}
+
+int main()
+{
+    char str[MAX_STR];
+   // scanf("%[^/n]",str);
+    printf("请输入字符串:");
+    fgets(str,MAX_STR,stdin);
+    //s[strcspn(s,'\n')]=0;
+    char *newline = strchr(str, '\n');
+    if (newline != NULL) *newline = '\0';
+
+    int* s=count(str,strlen(str));
+    Node** arr=init_arr(MAX_NODE,s);
+    Heap* h=init_heap(MAX_HEAP);
+    for(int i=0;i<fc;i++)push(h,arr[i]);//压入堆
+    Node* root=CLO_build_halfman_tree(arr,h,fc);
+    char buff[MAX_STR];
+    halfman_coding(root,buff,0);
+    
+    clear_tree(root);
+    clear_heap(h);
+    return 0;
+}
