@@ -1,0 +1,85 @@
+/*************************************************************************
+        > File Name: 33.冒泡排序及其优化.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Wed 05 Jun 2024 04:50:43 PM CST
+ ************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#define MAX_ARR 100000
+#define swap(a,b)\
+{\
+    __typeof(a) __c=a;\
+    a=b,b=__c;\
+}
+#define TEST(func,arr,l,r)\
+{\
+    int n=r-l;\
+    printf("test:%s\n",#func);\
+    int * t=(int *)malloc(sizeof(int)*n);\
+    memcpy(t,arr,sizeof(int)*n);\
+    long long a=clock();\
+    func(t,l,r);\
+    long long b=clock();\
+    if(check(t,n))printf("OK %lldms\n",(b-a)*1000/CLOCKS_PER_SEC);\
+    else printf("FAIL\n");\
+    free(t);\
+}
+
+int check(int *t,int n)
+{
+    for(int i=1;i<n;i++)
+    {
+        if(t[i-1]>t[i])return 0;
+    }
+    return 1;
+}
+
+int *init_arr(int n)
+{
+    
+    int* arr=(int*)malloc(sizeof(int)*n);
+    for(int i=0;i<n;i++)arr[i]=rand()%10000;
+    return arr;
+}
+
+void bubble_sort(int *arr, int l,int r)
+{
+    for(int i=r-1;i>=l;i--)
+    {
+        for(int j=l+1;j<=i;j++)
+        {
+            if(arr[j-1]>arr[j])swap(arr[j-1],arr[j]);
+        }
+    }
+    return ;
+}
+
+void OP_bubble_sort(int *arr,int l,int r)
+{
+    for(int i=r-1,count=0;i>=l;i--)
+    {
+        for(int j=l+1;j<=i;j++)
+        {
+            if(arr[j-1]<=arr[j])continue;
+            swap(arr[j-1],arr[j]);
+            count++;
+        }
+        if(count==0)break;
+    }
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    int *arr=init_arr(MAX_ARR);
+
+    TEST(bubble_sort,arr,0,MAX_ARR);
+    TEST(OP_bubble_sort,arr,0,MAX_ARR);
+
+    free(arr);
+    return 0;
+}
