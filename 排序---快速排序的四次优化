@@ -1,0 +1,236 @@
+/*************************************************************************
+        > File Name: 35.快速排序的四种优化.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Thu 06 Jun 2024 06:29:07 PM CST
+ ************************************************************************/
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#define MAX_ARR 10000000
+#define SCOPE 16
+#define swap(a,b)\
+{\
+    __typeof(a) __c=a;\
+    a=b,b=__c;\
+}
+#define TEST(func,arr,l,r)\
+{\
+    printf("test: %s\t",#func);\
+    int n=r-l;\
+    int* t=(int*)malloc(sizeof(int)*n);\
+    memcpy(t,arr,n);\
+    long long a=clock();\
+    func(t,l,r);\
+    long long b=clock();\
+    if(check(t,n))printf("OK %lldms\n",(b-a)*1000/CLOCKS_PER_SEC);\
+    else printf("FAIL\n");\
+    free(t);\
+}
+
+int check(int* t,int n)
+{
+    for(int i=1;i<n;i++)
+    {
+        if(t[i-1]>t[i])return 0;
+    }
+    return 1;
+}
+
+int* init_arr(int n)
+{
+    int* arr=(int*)malloc(sizeof(int)*n);
+    for(int i=0;i<n;i++)arr[i]=rand()%10000000;
+    return arr;
+}
+
+void quick_sort(int* arr,int l,int r)
+{
+    if(r-l<=2)
+    {
+        if(r-l<=1)return ;
+        if(arr[l]>arr[r-1])swap(arr[l],arr[r-1]);
+        return ;
+    }
+    int x=l,y=r-1,z=arr[l];
+    while(y>x)
+    {
+        while(y>x&&arr[y]>z)y--;
+        if(y>x)arr[x++]=arr[y];
+        while(y>x&&arr[x]<z)x++;
+        if(y>x)arr[y--]=arr[x];
+    }
+    arr[x]=z;
+    quick_sort(arr,l,x);
+    quick_sort(arr,x+1,r);
+    return ;
+}
+
+
+void quick_sort_1(int* arr,int l,int r)
+{
+    if(r-l<=2)
+    {
+        if(r-l<=1)return ;
+        if(arr[l]>arr[l+1])swap(arr[l],arr[l+1]);
+        return;
+    }
+    int x=l,y=r-1,z=arr[l];
+    while(y>x)
+    {
+        while(y>x&&arr[y]>=z)y--;
+        if(y>x)arr[x++]=arr[y];
+        while(y>x&&arr[x]<=z)x++;
+        if(y>x)arr[y--]=arr[x];
+    }
+    arr[x]=z;
+    quick_sort_1(arr,l,x);
+    quick_sort_1(arr,x+1,r);
+    return ;
+}
+
+void quick_sort_v1(int *arr,int l,int r)
+{
+    if(r-l<=2)
+    {
+        if(r-l<=1)return ;
+        if(arr[l]>arr[l+1])swap(arr[l],arr[l+1]);
+        return ;
+    }
+    int x=l,y=r-1,z=arr[l];
+    do
+    {
+        while(arr[y]>z)y--;
+        while(arr[x]<z)x++;
+        if(x<=y)
+        {
+            swap(arr[x],arr[y]);
+            x++,y--;
+        }
+    }while(x<=y);
+    quick_sort_v1(arr,l,y+1);
+    quick_sort_v1(arr,x,r);
+return ;
+}
+
+int middle(int a,int b,int c)
+{
+    if(a>b)swap(a,b);
+    if(a>c)swap(a,c);
+    if(b>c)swap(a,c);
+    return b;
+}
+
+void quick_sort_v2(int *arr,int l,int r)
+{
+    if(r-l<=2)
+    {
+        if(r-l<=1)return ;
+        if(arr[l]>arr[l+1])swap(arr[l],arr[l+1]);
+        return ;
+    }
+    int x=l,y=r-1,z=middle(arr[l],arr[r-1],arr[(l+r)/2+1]);
+    do
+    {
+        while(arr[y]>z)y--;
+        while(arr[x]<z)x++;
+        if(x<=y)
+        {
+            swap(arr[x],arr[y]);
+            x++,y--;
+        }
+    }while(x<=y);
+    quick_sort_v2(arr,l,y+1);
+    quick_sort_v2(arr,x,r);
+return ;
+}
+
+void quick_sort_v3(int *arr,int l,int r)
+{
+    while(r>l)
+    {
+        int x=l,y=r-1,z=middle(arr[l],arr[r-1],arr[(l+r)/2+1]);
+        do
+        {
+            while(arr[y]>z)y--;
+            while(arr[x]<z)x++;
+            if(x<=y)
+            {
+                swap(arr[x],arr[y]);
+                x++,y--;
+            }
+        }while(x<=y);
+        quick_sort_v3(arr,l,y+1);
+        l=x;
+    }
+return ;
+}
+
+void __quick_sort_v4(int *arr,int l,int r)
+{
+    while(r-l>SCOPE)
+    {
+        int x=l,y=r-1,z=middle(arr[l],arr[r-1],arr[(l+r)/2+1]);
+        do
+        {
+            while(arr[y]>z)y--;
+            while(arr[x]<z)x++;
+            if(x<=y)
+            {
+                swap(arr[x],arr[y]);
+                x++,y--;
+            }
+        }while(x<=y);
+        __quick_sort_v4(arr,l,y+1);
+        l=x;
+    }
+return ;
+}
+
+void UC_insert_sort(int *arr,int l,int r)
+{
+    int min=l;
+    for(int i=l;i<r;i++)
+    {
+        if(arr[min]>arr[i])min=i;
+    }
+    while(min>l)
+    {
+        swap(arr[min],arr[min-1]);
+        min=min-1;
+    }
+    for(int i=l+2;i<r;i++)
+    {
+        int j=i;
+        while(arr[j]<arr[j-1])
+        {
+            swap(arr[j],arr[j-1]);
+            j=j-1;
+        }
+    }
+    return ;
+}
+
+void quick_sort_v4(int *arr,int l,int r)
+{
+    __quick_sort_v4(arr,l,r);
+    UC_insert_sort(arr,l,r);
+    return ;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    int* arr=init_arr(MAX_ARR);
+    
+    TEST(quick_sort,arr,0,MAX_ARR);
+    //TEST(quick_sort_1,arr,0,MAX_ARR);
+    TEST(quick_sort_v1,arr,0,MAX_ARR);
+    TEST(quick_sort_v2,arr,0,MAX_ARR);
+    TEST(quick_sort_v3,arr,0,MAX_ARR);
+    TEST(quick_sort_v4,arr,0,MAX_ARR);
+    free(arr);
+    return 0;
+}
