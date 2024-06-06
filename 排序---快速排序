@@ -56,9 +56,9 @@ void quick_sort(int *arr,int l,int r)
     int a=l,b=r-1,z=arr[a];
     while(b>a)
     {
-        while(b>a&&arr[b]>=z)b--;
+        while(b>a&&arr[b]>z)b--;
         if(b>a)arr[a++]=arr[b];
-        while(b>a&&arr[a]<=z)a++;
+        while(b>a&&arr[a]<z)a++;
         if(b>a)arr[b--]=arr[a];
     }
     arr[a]=z;
