@@ -1,0 +1,98 @@
+/*************************************************************************
+        > File Name: 36.归并排序.c
+        > Author:SJQ
+        > Mail:3505224319@qq.com
+        > Created Time: Sat 08 Jun 2024 02:41:27 PM CST
+ ************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#define MAX_ARR 100000
+#define swap(a,b)\
+{\
+    __typeof(a) __c=a;\
+    a=b,b=__c;\
+}
+#define TEST(func,arr,l,r)\
+{\
+    printf("test:%s\t",#func);\
+    int n=r-l;\
+    int* t=(int*)malloc(sizeof(int)*n);\
+    memcpy(t,arr,sizeof(int)*n);\
+    long long a=clock();\
+    func(t,l,r);\
+    long long b=clock();\
+    if(check(t,n))printf("OK %lldms\n",(b-a)*1000/CLOCKS_PER_SEC);\
+    else printf("FAIL");\
+    free(t);\
+}
+int check(int* t,int n)
+{
+    for(int i=1;i<n;i++)
+    {
+        if(t[i-1]>t[i])return 0;
+    }
+    return 1;
+}
+
+int* init_arr(int n)
+{
+    int* arr=(int*)malloc(sizeof(int)*n);
+    for(int i=0;i<n;i++)arr[i]=rand()%100000;
+    return arr;
+}
+int *buff;
+void OP_merger_sort(int *arr,int l,int r)
+{
+    if(r-l<=1) return ;
+    int mid=(r+l)/2;
+    int p1=l,p2=mid;
+    OP_merger_sort(arr,l,mid);
+    OP_merger_sort(arr,mid,r);
+    int i=0;
+    while(p1<mid||p2<r)
+    {
+        if(p2==r||(p1<mid&&arr[p1]<arr[p2]))
+        {
+            buff[i++]=arr[p1++];
+        }
+        else buff[i++]=arr[p2++];
+    }
+    for(int i=l;i<r;i++)arr[i]=buff[i-l];
+    return ;
+}
+void merger_sort(int *arr,int l,int r)
+{
+    if(r-l<=1) return ;
+    int mid=(r+l)/2;
+    int p1=l,p2=mid;
+    int* temp=(int *)malloc(sizeof(int)*(r-l));
+    merger_sort(arr,l,mid);
+    merger_sort(arr,mid,r);
+    int i=0;
+    while(p1<mid||p2<r)
+    {
+        if(p2==r||(p1<mid&&arr[p1]<arr[p2]))
+        {
+            temp[i++]=arr[p1++];
+        }
+        else temp[i++]=arr[p2++];
+    }
+    for(int i=l;i<r;i++)arr[i]=temp[i-l];
+    free(temp);
+    return ;
+}
+
+int main()
+{
+    srand((unsigned)time(0));
+    int *arr=init_arr(MAX_ARR);
+    buff=(int *)malloc(sizeof(int)*MAX_ARR);
+    TEST(merger_sort,arr,0,MAX_ARR);
+    TEST(OP_merger_sort,arr,0,MAX_ARR);
+    free(arr);
+    free(buff);
+    return 0;
+}
